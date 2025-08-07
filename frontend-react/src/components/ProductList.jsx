@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useCart } from "../context/CartContext";
 import '../styles/productList.css'
-import { CiFileOn } from "react-icons/ci";
 
 export default function ProductList() {
     const [products, setProducts] = useState([]);
