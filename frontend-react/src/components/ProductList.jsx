@@ -1,24 +1,13 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
 import { useCart } from "../context/CartContext";
 import '../styles/productList.css'
 
 export default function ProductList() {
-    const [products, setProducts] = useState([]);
-    const { addToCart } = useCart();
+    const { products, loading, addToCart } = useCart();
 
-    useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                const response = await axios.get("http://localhost:3000/api/products");
-                setProducts(response.data);
-            } catch (error) {
-                console.error("Error al obtener productos:", error);
-            }
-        };
-
-        fetchProducts();
-    }, []);
+    if (loading) return <div className="spinner">
+        <div className="loader"></div>
+    </div>;
+    
 
     return (
         <div className="container-productList">

@@ -5,11 +5,24 @@ const CartContext = createContext();
 
 export function CartProvider({ children }) {
     const [cart, setCart] = useState([]);
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true); 
 
-    // Configuración base de axios (opcional, pero útil para evitar repetir la URL)
     const api = axios.create({
         baseURL: "http://localhost:3000/api",
     });
+
+    // Función para obtener productos
+    const fetchProducts = async () => {
+        try {
+            const response = await api.get("/products");
+            setProducts(response.data);
+            setLoading(false);
+        } catch (error) {
+            console.error("Error fetching products:", error);
+            setLoading(false);
+        }
+    };
 
     const fetchCart = async () => {
         try {
@@ -23,19 +36,31 @@ export function CartProvider({ children }) {
     const addToCart = async (product) => {
         try {
             await api.post("/cart", product);
-            await fetchCart(); 
+            await fetchCart();
         } catch (error) {
             console.error("Error adding to cart:", error);
         }
     };
 
-    // Opcional: Cargar el carrito al iniciar
+    // Cargar datos iniciales
     useEffect(() => {
-        fetchCart();
+        const loadData = async () => {
+            await fetchProducts();
+            await fetchCart();
+        };
+        loadData();
     }, []);
 
     return (
-        <CartContext.Provider value={{ cart, fetchCart, addToCart }}>
+        <CartContext.Provider 
+            value={{ 
+                cart, 
+                products, 
+                loading,
+                fetchCart, 
+                addToCart 
+            }}
+        >
             {children}
         </CartContext.Provider>
     );

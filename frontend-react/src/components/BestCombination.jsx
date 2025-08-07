@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
+import { useState } from "react";
+import { useCart } from "../context/CartContext";
 import '../styles/bestCombination.css';
 
 function findBestCombination(products, budget) {
@@ -28,25 +28,14 @@ function findBestCombination(products, budget) {
 
 export default function BestCombination() {
     const [budget, setBudget] = useState(150);
-    const [products, setProducts] = useState([]);
+    const { products, loading } = useCart();
 
-    useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                const response = await axios.get("http://localhost:3000/api/products");
-                setProducts(response.data);
-            } catch (error) {
-                console.error("Error al obtener productos:", error);
-            }
-        };
-
-        fetchProducts();
-    }, []);
+    if (loading) return <div>Cargando productos...</div>;
 
     const bestCombo = findBestCombination(products, budget);
 
     return (
-        <div className="container-bestCombination"> 
+        <div className="container-bestCombination">
             <h2>Mejor combinación para presupuesto: ${budget}</h2>
 
             <input
@@ -54,20 +43,20 @@ export default function BestCombination() {
                 value={budget}
                 onChange={(e) => setBudget(Number(e.target.value))}
             />
-            <span className="bestCombination-span"> 
+            <span className="bestCombination-span">
                 *Coloca un presupuesto
             </span>
             
-            <div className="bestCombination-content"> 
-                <ul className="bestCombination-items"> 
+            <div className="bestCombination-content">
+                <ul className="bestCombination-items">
                     {bestCombo.map((product) => (
-                        <li key={product.id} className="bestCombination-item"> 
-                            <span className="product-name">{product.name}</span> 
-                            <span className="product-price">${product.price}</span> 
+                        <li key={product.id} className="bestCombination-item">
+                            <span className="product-name">{product.name}</span>
+                            <span className="product-price">${product.price}</span>
                         </li>
                     ))}
                 </ul>
-                <p className="bestCombination-total"> 
+                <p className="bestCombination-total">
                     Total: ${bestCombo.reduce((sum, p) => sum + p.price, 0)}
                 </p>
             </div>
